@@ -1,18 +1,10 @@
 package phones.impl;
 
 import phones.PhoneStatus;
-import phones.system.Call;
-import phones.system.CallIncoming;
-import phones.system.CallOutgoing;
-import phones.system.PhoneSocket;
-import phones.system.ConnectedPhone;
-import phones.system.RejectReason;
+import phones.system.*;
 
-/**
- *
- */
 public class DefaultPhone implements ConnectedPhone {
-    
+
     private final PhoneSocket socket;
     private PhoneStatus status = PhoneStatus.IDLE;
     private String lastMessage = null;
@@ -36,6 +28,12 @@ public class DefaultPhone implements ConnectedPhone {
 
     @Override
     public void pushGreen() {
+        if (status == PhoneStatus.RINGING) {
+            call = incoming.accept(this::onMessageReceive, this::onCallEnd);
+            onCallAccept(call);
+        } else {
+            status = PhoneStatus.CALLING;
+        }
     }
 
     @Override
@@ -44,31 +42,34 @@ public class DefaultPhone implements ConnectedPhone {
 
     @Override
     public void send(String message) {
+        call.send(message);
     }
 
     @Override
     public void receive(CallIncoming request) {
+        status = PhoneStatus.RINGING;
         incoming = request;
-        call = incoming.accept(this::onMessageReceive, this::onCallEnd);
     }
 
     @Override
     public void canceled(CallIncoming request) {
     }
-    
+
     protected void onCallReject(RejectReason reason) {
     }
-    
+
     protected void onCallAccept(Call call) {
+        status = PhoneStatus.IN_CALL;
+        this.call = call;
     }
-    
+
     protected void onMessageReceive(String message) {
         lastMessage = message;
     }
-    
+
     protected void onCallEnd() {
     }
-    
+
     @Override
     public PhoneStatus getStatus() {
         return status;

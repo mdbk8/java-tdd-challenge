@@ -12,7 +12,7 @@ import static phones.PhoneStatus.*;
 
 public class DefaultPhoneTest {
     
-    private static final String ALICE = "555-ALICE";
+    private static final String ALICE = "555-ALI`CE";
     private static final String BOB = "555-THE-BOBSTER";
     private static final String CAROL = "555-CAROL";
     
